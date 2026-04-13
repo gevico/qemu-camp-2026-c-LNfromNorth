@@ -6,9 +6,22 @@
 #include <stdlib.h>
 #include <string.h>
 
+void to_lowercase(char *str) {
+  for (; *str; ++str)
+    *str = tolower((unsigned char)*str);
+}
+
 void trim(char *str) {
     // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    if (!str) return;
+    int len = strlen(str);
+    while (len > 0 && isspace((unsigned char)str[len-1])) {
+        str[len-1] = '\0';
+        len--;
+    }
+    char *p = str;
+    while (*p && isspace((unsigned char)*p)) p++;
+    if (p != str) memmove(str, p, strlen(p) + 1);
 }
 
 int load_dictionary(const char *filename, HashTable *table,
@@ -25,15 +38,33 @@ int load_dictionary(const char *filename, HashTable *table,
   int in_entry = 0;
 
     // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    while (fgets(line, sizeof(line), file)) {
+        trim(line);
+        if (line[0] == '\0') continue;
+        
+        if (line[0] == '#') {
+            if (current_word[0] != '\0') {
+                hash_table_insert(table, current_word, current_translation);
+                (*dict_count)++;
+                current_word[0] = '\0';
+                current_translation[0] = '\0';
+            }
+            strncpy(current_word, line + 1, sizeof(current_word) - 1);
+            trim(current_word);
+            to_lowercase(current_word);
+        } else if (strncmp(line, "Trans:", 6) == 0) {
+            strncat(current_translation, line + 6, sizeof(current_translation) - strlen(current_translation) - 1);
+            strncat(current_translation, " ", sizeof(current_translation) - strlen(current_translation) - 1);
+        }
+    }
+    
+    if (current_word[0] != '\0') {
+        hash_table_insert(table, current_word, current_translation);
+        (*dict_count)++;
+    }
 
   fclose(file);
   return 0;
-}
-
-void to_lowercase(char *str) {
-  for (; *str; ++str)
-    *str = tolower((unsigned char)*str);
 }
 
 int __cmd_mytrans(const char* filename) {
@@ -45,7 +76,10 @@ int __cmd_mytrans(const char* filename) {
 
   printf("=== 哈希表版英语翻译器（支持百万级数据）===\n");
   uint64_t dict_count = 0;
-  if (load_dictionary("/workspace/exercises/20_mybash/src/mytrans/dict.txt", table, &dict_count) != 0) {
+  if (load_dictionary("../19_mytrans/dict.txt", table, &dict_count) != 0 &&
+      load_dictionary("../../exercises/19_mytrans/dict.txt", table, &dict_count) != 0 &&
+      load_dictionary("/home/hubotao/Workspace/qemu-lab/qemu-camp-2026-c-LNfromNorth/exercises/20_mybash/src/mytrans/dict.txt", table, &dict_count) != 0 &&
+      load_dictionary("src/mytrans/dict.txt", table, &dict_count) != 0) {
     fprintf(stderr, "加载词典失败，请确保 dict.txt 存在。\n");
     free_hash_table(table);
     return 1;

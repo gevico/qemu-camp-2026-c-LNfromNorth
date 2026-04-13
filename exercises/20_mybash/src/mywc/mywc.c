@@ -27,7 +27,20 @@ void add_word(WordCount **hash_table, const char *word) {
   WordCount *entry = hash_table[index];
 
     // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    while(entry) {
+        if(strcmp(entry->word, word) == 0) {
+            entry->count++;
+            return;
+        }
+        entry = entry->next;
+    }
+    
+    // 如果没有找到，则创建新节点并头插
+    WordCount* new_word = (WordCount*)calloc(1, sizeof(WordCount));
+    strcpy(new_word->word, word);
+    new_word->count = 1;
+    new_word->next = hash_table[index];
+    hash_table[index] = new_word;
 }
 
 // 打印单词统计结果
@@ -36,7 +49,13 @@ void print_word_counts(WordCount **hash_table) {
   printf("======================\n");
 
     // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    for(int i = 0; i < HASH_SIZE; i++) {
+        WordCount* p = hash_table[i];
+        while(p) {
+            printf("%-20s %d\n", p->word, p->count);
+            p = p->next;
+        }
+    }
 }
 
 // 释放哈希表内存
