@@ -14,11 +14,10 @@ TARGET_PATH := $(BINDIR)/$(TARGET)
 
 all: $(TARGET_PATH)
 
-$(TARGET_PATH): $(OBJS)
-	$(CC) $(CFLAGS) $^ $(LINKLIBS) -o $@
+$(TARGET_PATH): $(OBJS) Makefile
+	$(CC) $(CFLAGS) -pie -fPIE $(OBJS) $(LINKLIBS) -o $@
 
 $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -fPIE -c $< -o $@
 clean:
 	@rm -rf $(OBJDIR)/*.o $(TARGET_PATH)
-
