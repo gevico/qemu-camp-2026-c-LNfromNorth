@@ -12,7 +12,12 @@ all: $(LIB_PATH)
 $(LIB_PATH): $(OBJS)
 	ar rcs $@ $^
 
-$(OBJDIR)/%.o: %.c
+$(OBJDIR)/mywc.o: mywc.c
+	@mkdir -p $(OBJDIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/mywc_main.o: mywc_main.c
+	@mkdir -p $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
