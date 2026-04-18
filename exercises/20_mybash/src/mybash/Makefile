@@ -9,15 +9,18 @@ OBJDIR ?= ./obj
 LINKLIBS ?= -L../../obj/mysed -lmysed -L../../obj/mywc -lmywc -L../../obj/mytrans -lmytrans -L../../obj/myfile -lmyfile
 
 SRCS := main.c
-OBJS := $(patsubst %.c,$(OBJDIR)/%.o,$(SRCS))
+OBJS := $(OBJDIR)/main.o
 TARGET_PATH := $(BINDIR)/$(TARGET)
 
 all: $(TARGET_PATH)
 
 $(TARGET_PATH): $(OBJS) Makefile
+	@mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) -pie -fPIE $(OBJS) $(LINKLIBS) -o $@
 
-$(OBJDIR)/%.o: %.c
+$(OBJDIR)/main.o: main.c
+	@mkdir -p $(OBJDIR)
 	$(CC) $(CFLAGS) -fPIE -c $< -o $@
+
 clean:
 	@rm -rf $(OBJDIR)/*.o $(TARGET_PATH)
